@@ -1,0 +1,1265 @@
+{
+	"info": {
+		"_postman_id": "5c1b8d7e-e2e7-4450-bc8b-864fc625dcc7",
+		"name": "Smart Licensing Using Policy Offline",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication & SA/VA ID",
+			"item": [
+				{
+					"name": "01 - Get Auth Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"pm.environment.set(\"access_token\", jsonData.access_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"type": "default"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "default"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://cloudsso.cisco.com/as/token.oauth2",
+							"protocol": "https",
+							"host": [
+								"cloudsso",
+								"cisco",
+								"com"
+							],
+							"path": [
+								"as",
+								"token.oauth2"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "01 - Get Auth Token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "client_id",
+											"value": "{{client_id}}",
+											"type": "default"
+										},
+										{
+											"key": "client_secret",
+											"value": "{{client_secret}}",
+											"type": "default"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "default"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://cloudsso.cisco.com/as/token.oauth2",
+									"protocol": "https",
+									"host": [
+										"cloudsso",
+										"cisco",
+										"com"
+									],
+									"path": [
+										"as",
+										"token.oauth2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"access_token\": \"aaaaaaaaaaaaaaaaaaaaaaa\",\n    \"token_type\": \"Bearer\",\n    \"expires_in\": 3599\n}"
+						}
+					]
+				},
+				{
+					"name": "02 - Get SA/VA IDs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var index = 0\r",
+									"// Find Smart Account ID\r",
+									"for (account in jsonData.accounts) {\r",
+									"    if ((jsonData.accounts[account].domain).toLowerCase() == (pm.environment.get(\"smart_account\")).toLowerCase())  {\r",
+									"        sa_id = jsonData.accounts[account].account_id\r",
+									"        pm.environment.set(\"smart_account_id\", sa_id);\r",
+									"        index = account\r",
+									"        break\r",
+									"    }\r",
+									"}\r",
+									"// Find Virtual Account ID\r",
+									"for (account in jsonData.accounts[index].virtual_accounts) {\r",
+									"    for (var [key, value] of Object.entries(jsonData.accounts[index].virtual_accounts[account])) {\r",
+									"        if (key == \"name\" && value == pm.environment.get(\"virtual_account\")) {\r",
+									"            va_id = jsonData.accounts[index].virtual_accounts[account].virtual_account_id\r",
+									"            pm.environment.set(\"virtual_account_id\", va_id);\r",
+									"            break\r",
+									"    }\r",
+									"}\r",
+									"}\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v2/accounts/search",
+							"protocol": "https",
+							"host": [
+								"swapi",
+								"cisco",
+								"com"
+							],
+							"path": [
+								"services",
+								"api",
+								"services",
+								"api",
+								"smart-accounts-and-licensing",
+								"v2",
+								"accounts",
+								"search"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "02 - Get Smart Account ID",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "default"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{{access_token}}",
+										"type": "default"
+									}
+								],
+								"url": {
+									"raw": "https://swapi.cisco.com/services/api/smart-accounts-and-licensing/v1/accounts/search?name={{smart_account}}",
+									"protocol": "https",
+									"host": [
+										"swapi",
+										"cisco",
+										"com"
+									],
+									"path": [
+										"services",
+										"api",
+										"smart-accounts-and-licensing",
+										"v1",
+										"accounts",
+										"search"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "{{smart_account}}"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"message_code\": \"\",\n    \"accounts\": [\n        {\n            \"account_id\": \"123456\",\n            \"domain\": \"testaccount.local\",\n            \"name\": \"testaccount.local\",\n            \"virtual_accounts\": [\n                {\n                    \"default\": false,\n                    \"name\": \"Lab-01\",\n                    \"virtual_account_id\": \"123456\"\n                },\n                {\n                    \"default\": false,\n                    \"name\": \"Lab-02\",\n                    \"virtual_account_id\": \"123456\"\n                }\n            ]\n        }\n    ],\n    \"message\": \"\",\n    \"status\": \"COMPLETE\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "License Reservation",
+			"item": [
+				{
+					"name": "03 - Request Authorization Code",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"timestamp\", new Date().getTime());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"id =  pm.response.text().replace(/[:|: *](\\d+)/g,': \"$1\"');\r",
+									"\r",
+									"var jsonData = JSON.parse(id);\r",
+									"pm.environment.set(\"poll_id\", jsonData.poll_id);\r",
+									"pm.environment.set(\"poll_type\", jsonData.action);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-SMART-ACCOUNT-ID",
+								"value": "{{smart_account_id}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-VIRTUAL-ACCOUNT-ID",
+								"value": "{{virtual_account_id}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-REQUESTING-SYSTEM",
+								"value": "{\"udi_pid\": \"{{device_pid}}\",  \"udi_serial_number\": \"{{device_serial}}\"}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"timestamp\": {{timestamp}},\r\n    \"nonce\": \"random1234\",\r\n    \"licenses\": [\r\n      {\r\n        \"sudi\": {\r\n          \"udi_pid\": \"{{device_pid}}\",\r\n          \"udi_serial_number\": \"{{device_serial}}\"\r\n        },\r\n        \"hostname\": \"{{device_hostname}}\",\r\n        \"keys\": [\r\n          {\r\n            \"entitlement\": \"{{license_tag}}\",\r\n            \"count\": \"1\"\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v2/devices/authrequest",
+							"protocol": "https",
+							"host": [
+								"swapi",
+								"cisco",
+								"com"
+							],
+							"path": [
+								"services",
+								"api",
+								"services",
+								"api",
+								"smart-accounts-and-licensing",
+								"v2",
+								"devices",
+								"authrequest"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "04 - Request Authorization Code",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-SMART-ACCOUNT-ID",
+										"value": "{{smart_account_id}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-VIRTUAL-ACCOUNT-ID",
+										"value": "{{virtual_account_id}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-REQUESTING-SYSTEM",
+										"value": "{\"udi_pid\": \"{{device_pid}}\",  \"udi_serial_number\": \"{{device_serial}}\"}",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"data\": {\r\n    \"timestamp\": 1234574567,\r\n    \"nonce\": \"random1234\",\r\n    \"licenses\": [\r\n      {\r\n        \"sudi\": {\r\n          \"udi_pid\": \"C8000V\",\r\n          \"udi_serial_number\": \"ASDF1234\"\r\n        },\r\n        \"hostname\": \"Test-Device-01\",\r\n        \"keys\": [\r\n          {\r\n            \"entitlement\": \"regid.2019-03.com.cisco.DNA_HSEC,1.0_509c41ab-05a8-431f-95fe-ec28086e8844\",\r\n            \"count\": \"1\"\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v2/devices/authrequest",
+									"protocol": "https",
+									"host": [
+										"swapi",
+										"cisco",
+										"com"
+									],
+									"path": [
+										"services",
+										"api",
+										"services",
+										"api",
+										"smart-accounts-and-licensing",
+										"v2",
+										"devices",
+										"authrequest"
+									]
+								}
+							},
+							"status": "Accepted",
+							"code": 202,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"status\": \"OK_POLL\",\n    \"message_code\": null,\n    \"message\": null,\n    \"timestamp\": 1656010025453,\n    \"nonce\": \"random1234\",\n    \"type\": null,\n    \"poll_id\": 773126444402795033,\n    \"poll_interval\": 300,\n    \"action\": \"authorizations\"\n}"
+						}
+					]
+				},
+				{
+					"name": "04 & 06 - Check License Request / Obtain License / Get License ACK",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"timestamp\", new Date().getTime());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-SMART-ACCOUNT-ID",
+								"value": "{{smart_account_id}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-VIRTUAL-ACCOUNT-ID",
+								"value": "{{virtual_account_id}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-REQUESTING-SYSTEM",
+								"value": "{\"udi_pid\": \"{{device_pid}}\",  \"udi_serial_number\": \"{{device_serial}}\"}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"timestamp\": {{timestamp}},\r\n    \"nonce\": \"random1234\",\r\n    \"poll_id\": {{poll_id}},\r\n    \"action\": \"{{poll_type}}\"\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v2/accounts/poll",
+							"protocol": "https",
+							"host": [
+								"swapi",
+								"cisco",
+								"com"
+							],
+							"path": [
+								"services",
+								"api",
+								"services",
+								"api",
+								"smart-accounts-and-licensing",
+								"v2",
+								"accounts",
+								"poll"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "04 & 06 - Check License Request / Obtain License",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-SMART-ACCOUNT-ID",
+										"value": "{{smart_account_id}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-VIRTUAL-ACCOUNT-ID",
+										"value": "{{virtual_account_id}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-REQUESTING-SYSTEM",
+										"value": "{\"udi_pid\": \"{{device_pid}}\",  \"udi_serial_number\": \"{{device_serial}}\"}",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"data\": {\r\n    \"timestamp\": 1656610485678,\r\n    \"nonce\": \"dft0qRN2fLw4kpaR\",\r\n    \"poll_id\": 775133662461034514,\r\n    \"action\": \"authorizations\"\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v2/accounts/poll",
+									"protocol": "https",
+									"host": [
+										"swapi",
+										"cisco",
+										"com"
+									],
+									"path": [
+										"services",
+										"api",
+										"services",
+										"api",
+										"smart-accounts-and-licensing",
+										"v2",
+										"accounts",
+										"poll"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "LICENSE REQUEST: \r\n{\r\n   \"status\":\"COMPLETE\",\r\n   \"message_code\":\"\",\r\n   \"message\":\"\",\r\n   \"timestamp\":1656610485678,\r\n   \"nonce\":\"dft0qRN2fLw4kpaR\",\r\n   \"type\":\"authorizations\",\r\n   \"correlation_id\":\"6cef0ec9-6a0e-43c6-a8a9-e6e0e572156b\",\r\n   \"data\":{\r\n      \"authorizations\":[\r\n         {\r\n            \"product_instance_identifier\":\"5278df84-7316-4332-88be-62623dd30b9e\",\r\n            \"sudi\":{\r\n               \"udi_pid\":\"C8000V\",\r\n               \"udi_serial_number\":\"123451234\"\r\n            },\r\n            \"smart_license\":\"<BASE64 ENCODED LICENSE>\",\r\n            \"auth_status\":[\r\n               \r\n            ],\r\n            \"error_code\":\"None\",\r\n            \"status\":\"SUCCESS\",\r\n            \"status_message\":\"None\",\r\n            \"correlation_id\":\"62bddeb34353e9338131ca6712d77e46-84c66b7830588c4c\"\r\n         }\r\n      ]\r\n   }\r\n}\r\n\r\n\r\n\r\nLICENSE ACK:\r\n{\r\n    \"status\": \"COMPLETE\",\r\n    \"message_code\": \"\",\r\n    \"message\": \"\",\r\n    \"timestamp\": 1656619468916,\r\n    \"nonce\": \"random1234\",\r\n    \"type\": \"acknowledgements\",\r\n    \"correlation_id\": \"72ee9c07-2376-4241-838c-78d267bec448\",\r\n    \"data\": {\r\n        \"acknowledgements\": [\r\n            {\r\n                \"sudi\": {\r\n                    \"udi_pid\": \"C8000V\",\r\n                    \"udi_serial_number\": \"123451234\"\r\n                },\r\n                \"software_tag_identifier\": \"C8000V\",\r\n                \"smart_license\": \"<BASE64 ENCODED ACK>\"\r\n            }\r\n        ]\r\n    }\r\n}"
+						}
+					]
+				},
+				{
+					"name": "05 - Report License Usage",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"timestamp\", new Date().getTime());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"id =  pm.response.text().replace(/[:|: *](\\d+)/g,': \"$1\"');\r",
+									"\r",
+									"var jsonData = JSON.parse(id);\r",
+									"pm.environment.set(\"poll_id\", jsonData.poll_id);\r",
+									"pm.environment.set(\"poll_type\", jsonData.action);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-SMART-ACCOUNT-ID",
+								"value": "{{smart_account_id}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-VIRTUAL-ACCOUNT-ID",
+								"value": "{{virtual_account_id}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-REQUESTING-SYSTEM",
+								"value": "{\"udi_pid\": \"{{device_pid}}\",  \"udi_serial_number\": \"{{device_serial}}\"}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"timestamp\": {{timestamp}},\r\n    \"nonce\": \"random1234\",\r\n    \"reports\": [\r\n      {\r\n        \"sudi\": {\r\n          \"udi_pid\": \"{{device_pid}}\",\r\n          \"udi_serial_number\": \"{{device_serial}}\"\r\n        },\r\n        \"usage\": [\r\n          {\r\n        \"payload\": {{usage_payload}},\r\n      \"signature\":{\r\n         \"sudi\":{\r\n            \"udi_pid\":\"{{device_pid}}\",\r\n            \"udi_serial_number\":\"{{device_serial}}\"\r\n         },\r\n         \"signing_type\":\"builtin\",\r\n         \"key\":\"{{usage_signature_key}}\",\r\n         \"value\":\"{{usage_signature_value}}\"\r\n      }\r\n   }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v2/devices/reportusage",
+							"protocol": "https",
+							"host": [
+								"swapi",
+								"cisco",
+								"com"
+							],
+							"path": [
+								"services",
+								"api",
+								"services",
+								"api",
+								"smart-accounts-and-licensing",
+								"v2",
+								"devices",
+								"reportusage"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "05 - Report License Usage",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-SMART-ACCOUNT-ID",
+										"value": "{{smart_account_id}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-VIRTUAL-ACCOUNT-ID",
+										"value": "{{virtual_account_id}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-REQUESTING-SYSTEM",
+										"value": "{\"udi_pid\": \"{{device_pid}}\",  \"udi_serial_number\": \"{{device_serial}}\"}",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"data\": {\r\n    \"timestamp\": 1644340472292,\r\n    \"nonce\": \"random1234\",\r\n    \"reports\": [{\r\n        \"sudi\": {\r\n          \"udi_pid\": \"{{device_pid}}\",\r\n          \"udi_serial_number\": \"{{device_serial}}\"\r\n        },\r\n        \"usage\": [\r\n          {\r\n            \"payload\": \"{\\\"asset_identification\\\":{\\\"asset\\\":{\\\"name\\\":\\\"regid.2019-10.com.cisco.C8000V,1.0_e361c3dc-27c2-4084-b4a4-cae639cff335\\\"},\\\"instance\\\":{\\\"sudi\\\":{\\\"udi_pid\\\":\\\"C8000V\\\",\\\"udi_serial_number\\\":\\\"ASDF12345\\\"}},\\\"signature\\\":{\\\"signing_type\\\":\\\"builtin\\\",\\\"key\\\":\\\"regid.2019-10.com.cisco.C8000V,1.0_e361c3dc-27c2-4084-b4a4-cae639cff335\\\",\\\"value\\\":\\\"VJL1uXEJ4b0MOI462D1EY=\\\"}},\\\"meta\\\":{\\\"entitlement_tag\\\":\\\"regid.2018-12.com.cisco.DNA_P_250M_A,1.0_0fd78701-7613-45a5-a3e1-8f1b619304fa\\\",\\\"report_id\\\":1646687340,\\\"software_version\\\":\\\"17.06.02\\\",\\\"ha_udi\\\":[{\\\"role\\\":\\\"Active\\\",\\\"sudi\\\":{\\\"udi_pid\\\":\\\"C8000V\\\",\\\"udi_serial_number\\\":\\\"ASDF12345\\\"}}]},\\\"measurements\\\":[{\\\"log_time\\\":1656339787,\\\"metric_name\\\":\\\"ENTITLEMENT\\\",\\\"start_time\\\":1656339498,\\\"end_time\\\":1656535705,\\\"sample_interval\\\":196207,\\\"num_samples\\\":218,\\\"value\\\":{\\\"type\\\":\\\"COUNT\\\",\\\"value\\\":\\\"1\\\"}},{\\\"log_time\\\":1656535715,\\\"metric_name\\\":\\\"ENTITLEMENT\\\",\\\"start_time\\\":1656535705,\\\"end_time\\\":1656598715,\\\"sample_interval\\\":63010,\\\"num_samples\\\":71,\\\"meta\\\":{\\\"termination_reason\\\":\\\"CurrentUsageRequested\\\"},\\\"value\\\":{\\\"type\\\":\\\"COUNT\\\",\\\"value\\\":\\\"0\\\"}}]}\",\r\n            \"signature\": {\r\n              \"sudi\": {\r\n                \"udi_pid\": \"C8000V\",\r\n                \"udi_serial_number\": \"ASDF12345\"\r\n              },\r\n              \"signing_type\": \"SHA-256\",\r\n              \"key\": \"regid.2019-10.com.cisco.C8000V,1.0_e361c3dc-27c2-4084-b4a4-cae639cff335\",\r\n              \"value\": \"FhWJQorLD=\"\r\n            }\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v2/devices/reportusage",
+									"protocol": "https",
+									"host": [
+										"swapi",
+										"cisco",
+										"com"
+									],
+									"path": [
+										"services",
+										"api",
+										"services",
+										"api",
+										"smart-accounts-and-licensing",
+										"v2",
+										"devices",
+										"reportusage"
+									]
+								}
+							},
+							"status": "Accepted",
+							"code": 202,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"status\": \"OK_POLL\",\n    \"message_code\": null,\n    \"message\": null,\n    \"timestamp\": 1644340472292,\n    \"nonce\": \"random1234\",\n    \"type\": null,\n    \"poll_id\": 77412347487202314,\n    \"poll_interval\": 300,\n    \"action\": \"acknowledgements\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "License Verification",
+			"item": [
+				{
+					"name": "03 - Get License Usage by Tag",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"timestamp\", new Date().getTime());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-SMART-ACCOUNT-ID",
+								"value": "{{smart_account_id}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-VIRTUAL-ACCOUNT-ID",
+								"value": "{{virtual_account_id}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-REQUESTING-SYSTEM",
+								"value": "{\"udi_pid\": \"{{device_pid}}\",  \"udi_serial_number\": \"{{device_serial}}\"}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"timestamp\": {{timestamp}},\r\n    \"nonce\": \"random1234\",\r\n    \"tags\": []\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v3/licenses/summary",
+							"protocol": "https",
+							"host": [
+								"swapi",
+								"cisco",
+								"com"
+							],
+							"path": [
+								"services",
+								"api",
+								"services",
+								"api",
+								"smart-accounts-and-licensing",
+								"v3",
+								"licenses",
+								"summary"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "05 - Report License Usage",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-SMART-ACCOUNT-ID",
+										"value": "{{smart_account_id}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-VIRTUAL-ACCOUNT-ID",
+										"value": "{{virtual_account_id}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-REQUESTING-SYSTEM",
+										"value": "{\"udi_pid\": \"{{device_pid}}\",  \"udi_serial_number\": \"{{device_serial}}\"}",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"data\": {\r\n    \"timestamp\": 123451234512345,\r\n    \"nonce\": \"random1234\",\r\n    \"tags\": [\"regid.2019-03.com.cisco.DNA_HSEC,1.0_509c41ab-05a8-431f-95fe-ec28086e8844\"]\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v2/devices/reportusage",
+									"protocol": "https",
+									"host": [
+										"swapi",
+										"cisco",
+										"com"
+									],
+									"path": [
+										"services",
+										"api",
+										"services",
+										"api",
+										"smart-accounts-and-licensing",
+										"v2",
+										"devices",
+										"reportusage"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"status\": \"SUCCESS\",\n    \"message_code\": null,\n    \"message\": \"Retrieved summary for 1 license in the pool.\",\n    \"timestamp\": 123451234512345,\n    \"nonce\": \"random1234\",\n    \"out_standing_reports\": 0,\n    \"summary\": [\n        {\n            \"tag\": \"regid.2019-03.com.cisco.DNA_HSEC,1.0_509c41ab-05a8-431f-95fe-ec28086e8844\",\n            \"compliance_status\": \"In Compliance\",\n            \"display_name\": \"Router US Export Lic. for DNA\",\n            \"enforced\": true,\n            \"export_restricted\": true,\n            \"license_details\": [\n                {\n                    \"billing_type\": \"PREPAID\",\n                    \"quantity\": 1,\n                    \"postpaid_usage\": null,\n                    \"start_date\": null,\n                    \"end_date\": null,\n                    \"subscription_id\": null,\n                    \"status\": \"ACTIVE\",\n                    \"billing_model\": null,\n                    \"license_type\": \"PERPETUAL\"\n                }\n            ],\n            \"prepaid_entitled\": 1,\n            \"prepaid_inuse\": 1,\n            \"prepaid_reserved\": 1\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "03a - Get Devices & License Assignment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"timestamp\", new Date().getTime());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"virtualAccounts\": [\r\n      \"{{virtual_account}}\"\r\n  ],\r\n  \"limit\": 10,\r\n  \"offset\": 0\r\n}"
+						},
+						"url": {
+							"raw": "https://swapi.cisco.com/services/api/smart-accounts-and-licensing/v1/accounts/{{smart_account}}/devices",
+							"protocol": "https",
+							"host": [
+								"swapi",
+								"cisco",
+								"com"
+							],
+							"path": [
+								"services",
+								"api",
+								"smart-accounts-and-licensing",
+								"v1",
+								"accounts",
+								"{{smart_account}}",
+								"devices"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "03a - Get Devices & License Assignment",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"virtualAccounts\": [\r\n      \"TEST\"\r\n  ],\r\n  \"limit\": 10,\r\n  \"offset\": 0\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://swapi.cisco.com/services/api/smart-accounts-and-licensing/v1/accounts/{{smart_account}}/devices",
+									"protocol": "https",
+									"host": [
+										"swapi",
+										"cisco",
+										"com"
+									],
+									"path": [
+										"services",
+										"api",
+										"smart-accounts-and-licensing",
+										"v1",
+										"accounts",
+										"{{smart_account}}",
+										"devices"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"totalRecords\": 1,\r\n    \"devices\": [\r\n        {\r\n            \"licenseUsage\": [\r\n                {\r\n                    \"license\": \"Router US Export Lic. for DNA\",\r\n                    \"quantity\": 1\r\n                }\r\n            ],\r\n            \"hostName\": \"\",\r\n            \"sudi\": {\r\n                \"macAddress\": null,\r\n                \"suvi\": null,\r\n                \"hostIdentifier\": null,\r\n                \"udiSerialNumber\": \"ABCD123456\",\r\n                \"udiPid\": \"C8000V\",\r\n                \"uuid\": null,\r\n                \"udiVid\": null\r\n            },\r\n            \"displayName\": \"UDI_PID:C8000V; UDI_SN:ABCD123456; \",\r\n            \"registrationDate\": \"2022-07-11T14:33:41Z\",\r\n            \"productTagName\": \"\",\r\n            \"virtualAccount\": \"TEST\",\r\n            \"productName\": \"\",\r\n            \"productDescription\": \"\",\r\n            \"productType\": \"\",\r\n            \"status\": \"In Compliance\",\r\n            \"lastContactDate\": \"2022-07-11T14:33:41Z\"\r\n        }\r\n    ],\r\n    \"statusMessage\": \"\",\r\n    \"status\": \"SUCCESS\"\r\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "License Return",
+			"item": [
+				{
+					"name": "03 - Remove License",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"timestamp\", new Date().getTime());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"id =  pm.response.text().replace(/[:|: *](\\d+)/g,': \"$1\"');\r",
+									"\r",
+									"var jsonData = JSON.parse(id);\r",
+									"pm.environment.set(\"poll_id\", jsonData.poll_id);\r",
+									"pm.environment.set(\"poll_type\", jsonData.action);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-SMART-ACCOUNT-ID",
+								"value": "{{smart_account_id}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-VIRTUAL-ACCOUNT-ID",
+								"value": "{{virtual_account_id}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-REQUESTING-SYSTEM",
+								"value": "{\"udi_pid\": \"{{device_pid}}\",  \"udi_serial_number\": \"{{device_serial}}\"}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"timestamp\": {{timestamp}},\r\n    \"nonce\": \"random1234\",\r\n    \"licenses\": [\r\n      {\r\n        \"sudi\": {\r\n          \"udi_pid\": \"{{device_pid}}\",\r\n          \"udi_serial_number\": \"{{device_serial}}\"\r\n        },\r\n        \"hostname\": \"{{device_hostname}}\",\r\n        \"keys\": [\r\n        ],\r\n        \"remove_code\": \"{{remove_code}}\"\r\n      }\r\n    ]\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v2/devices/authrequest",
+							"protocol": "https",
+							"host": [
+								"swapi",
+								"cisco",
+								"com"
+							],
+							"path": [
+								"services",
+								"api",
+								"services",
+								"api",
+								"smart-accounts-and-licensing",
+								"v2",
+								"devices",
+								"authrequest"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "04 - Remove License",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-SMART-ACCOUNT-ID",
+										"value": "{{smart_account_id}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-VIRTUAL-ACCOUNT-ID",
+										"value": "{{virtual_account_id}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-REQUESTING-SYSTEM",
+										"value": "{\"udi_pid\": \"{{device_pid}}\",  \"udi_serial_number\": \"{{device_serial}}\"}",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"data\": {\r\n    \"timestamp\": 1656010025453,\r\n    \"nonce\": \"random1234\",\r\n    \"licenses\": [\r\n      {\r\n        \"sudi\": {\r\n          \"udi_pid\": \"C8000V\",\r\n          \"udi_serial_number\": \"ASDF123456\"\r\n        },\r\n        \"hostname\": \"Test-Device-01\",\r\n        \"keys\": [\r\n        ],\r\n        \"remove_code\": \"dST8Mh-GZn1io-hzmKLB-2Jvse4\"\r\n      }\r\n    ]\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v2/devices/authrequest",
+									"protocol": "https",
+									"host": [
+										"swapi",
+										"cisco",
+										"com"
+									],
+									"path": [
+										"services",
+										"api",
+										"services",
+										"api",
+										"smart-accounts-and-licensing",
+										"v2",
+										"devices",
+										"authrequest"
+									]
+								}
+							},
+							"status": "Accepted",
+							"code": 202,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"status\": \"OK_POLL\",\n    \"message_code\": null,\n    \"message\": null,\n    \"timestamp\": 1656010025453,\n    \"nonce\": \"random1234\",\n    \"type\": null,\n    \"poll_id\": 773126444402795033,\n    \"poll_interval\": 300,\n    \"action\": \"authorizations\"\n}"
+						}
+					]
+				},
+				{
+					"name": "04 - Check Removal Request",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.variables.set(\"timestamp\", new Date().getTime());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-SMART-ACCOUNT-ID",
+								"value": "{{smart_account_id}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-VIRTUAL-ACCOUNT-ID",
+								"value": "{{virtual_account_id}}",
+								"type": "default"
+							},
+							{
+								"key": "X-CSW-REQUESTING-SYSTEM",
+								"value": "{\"udi_pid\": \"{{device_pid}}\",  \"udi_serial_number\": \"{{device_serial}}\"}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"data\": {\r\n    \"timestamp\": {{timestamp}},\r\n    \"nonce\": \"random1234\",\r\n    \"poll_id\": {{poll_id}},\r\n    \"action\": \"{{poll_type}}\"\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v2/accounts/poll",
+							"protocol": "https",
+							"host": [
+								"swapi",
+								"cisco",
+								"com"
+							],
+							"path": [
+								"services",
+								"api",
+								"services",
+								"api",
+								"smart-accounts-and-licensing",
+								"v2",
+								"accounts",
+								"poll"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "04 - Check Removal Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{access_token}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-SMART-ACCOUNT-ID",
+										"value": "{{smart_account_id}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-VIRTUAL-ACCOUNT-ID",
+										"value": "{{virtual_account_id}}",
+										"type": "default"
+									},
+									{
+										"key": "X-CSW-REQUESTING-SYSTEM",
+										"value": "{\"udi_pid\": \"{{device_pid}}\",  \"udi_serial_number\": \"{{device_serial}}\"}",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"data\": {\r\n    \"timestamp\": 1656610485678,\r\n    \"nonce\": \"dft0qRN2fLw4kpaR\",\r\n    \"poll_id\": 775133662461034514,\r\n    \"action\": \"authorizations\"\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://swapi.cisco.com/services/api/services/api/smart-accounts-and-licensing/v2/accounts/poll",
+									"protocol": "https",
+									"host": [
+										"swapi",
+										"cisco",
+										"com"
+									],
+									"path": [
+										"services",
+										"api",
+										"services",
+										"api",
+										"smart-accounts-and-licensing",
+										"v2",
+										"accounts",
+										"poll"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n    \"status\": \"COMPLETE\",\r\n    \"message_code\": \"\",\r\n    \"message\": \"\",\r\n    \"timestamp\": 1656618004017,\r\n    \"nonce\": \"random1234\",\r\n    \"type\": \"authorizations\",\r\n    \"correlation_id\": \"3750b0a5-27ad-44f5-abcf-23fd084c8f92\",\r\n    \"data\": {\r\n        \"authorizations\": [\r\n            {\r\n                \"product_instance_identifier\": \"790c86e8-5784-4b03-a291-91a293f94617\",\r\n                \"sudi\": {\r\n                    \"udi_pid\": \"C8000V\",\r\n                    \"udi_serial_number\": \"ASDF1234\"\r\n                },\r\n                \"smart_license\": null,\r\n                \"auth_status\": [],\r\n                \"error_code\": null,\r\n                \"status\": \"SUCCESS\",\r\n                \"status_message\": null,\r\n                \"correlation_id\": \"62bdfb8bd3e78f6b26537a4ab5d18f15-b6373324f01d0bd9\"\r\n            }\r\n        ]\r\n    }\r\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}
